@@ -3,10 +3,13 @@ package com.example.todo_list_app.service;
 import com.example.todo_list_app.dto.TaskDTO;
 import com.example.todo_list_app.model.Task;
 import com.example.todo_list_app.repository.TaskRepository;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,7 +43,6 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<TaskDTO> getAllTasks() {
-//        List<TaskDTO> taskDTOList = new ArrayList<>();
         List<Task> tasks = taskRepository.findAll();
         return tasks.stream()
                 .map(this::convertToDTO)
@@ -49,11 +51,31 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskDTO updateTask(Long id, TaskDTO taskDTO) {
-        return null;
+        Optional<Task> taskOptional = taskRepository.findById(id);
+        if (taskOptional.isPresent()) {
+            Task task = taskOptional.get();
+
+            task.setDescription(taskDTO.getDescription());
+            task.setCompleted(taskDTO.isCompleted());
+            task.setCategory(taskDTO.getCategory());
+            task.setDueDate(taskDTO.getDueDate());
+            Task updateTask = taskRepository.save(task);
+
+            return convertToDTO(updateTask);
+        } else {
+            return null;
+        }
     }
 
     @Override
     public void deleteTask(Long id) {
+        Optional<Task> taskOptional = taskRepository.findById(id);
+        if (taskOptional.isPresent()) {
+            Task task = taskOptional.get();
 
+            taskRepository.delete(task);
+        } else {
+            throw new EntityNotFoundException("Task with id " + id + "not found");
+        }
     }
 }
