@@ -4,8 +4,11 @@ import com.example.todo_list_app.dto.TaskDTO;
 import com.example.todo_list_app.model.Task;
 import com.example.todo_list_app.repository.TaskRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +29,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskDTO createTask(TaskDTO taskDTO) {
+    @PostMapping("/tasks")
+    public TaskDTO createTask(@Valid @RequestBody TaskDTO taskDTO) {
         Task task = convertToEntity(taskDTO);
         return convertToDTO(taskRepository.save(task));
     }

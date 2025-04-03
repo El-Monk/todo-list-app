@@ -1,18 +1,30 @@
 package com.example.todo_list_app.dto;
 
 import com.example.todo_list_app.model.Task;
-
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
 public class TaskDTO {
 
-    private long id;
+    private Long id;
+
+    @NotBlank(message = "Description cannot be blank")
+    @Size(max = 255, message = "Description cannot exceed 255 character")
     private String description;
     private boolean isCompleted;
     private String category;
+
+    @Future(message = "Due date must be in the future")
     private LocalDate dueDate;
 
-    public TaskDTO() {
+    public TaskDTO(Long id, String description, boolean isCompleted, String category, LocalDate dueDate) {
+        this.id = id;
+        this.description = description;
+        this.isCompleted = isCompleted;
+        this.category = category;
+        this.dueDate = dueDate;
     }
 
     public TaskDTO(Task task) {
